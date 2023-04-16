@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Escadron Asgard">
+    <meta http-equiv="content-language" content="fr">
+    <meta name="robots" content="index">
+    <link rel="icon" href="/web/img/heimdall.webp">
+
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abel">
+    <title>Heimdall</title>
+    <style>
+        /**{
+            font-family: 'Abel', sans-serif;
+            text-align: center;
+        }*/
+
+        @font-face {
+            font-family: "Parisine";
+            src: url("parisine/Parisine Regular.woff2");
+        }
+
+        body {
+            background-color:navajowhite;
+            color: white;
+            margin: 0 !important;
+            font-family: "Parisine", "Achemine", "Helvetica Neue", 'Arial', sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        #header {
+            user-select: none;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 10px;
+            background-color:#414449;
+        }
+
+        #header_gamename {
+            margin-left: 12px;
+            margin-right: 12px;
+            white-space: nowrap;
+        }
+
+        #navbar {
+            margin-left: 20px;
+            height: 100%;
+            display: inline-flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            text-align: center;
+        }
+
+        #navbar a {
+            margin-left: 10px;
+            margin-right: 10px;
+            padding: 6px;
+            color: white;
+            text-decoration: none;
+            height: 100%;
+            transition: .2s ease-out;
+            border-radius: 4px;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        #navbar a:hover {
+            background-color: #414449;
+        }
+
+        #navbar a.selected {
+            cursor: not-allowed;
+            background-color: #414449;
+        }
+
+        #title_area {
+            margin-top: 24px;
+            background-color: transparent;
+            display: inline-block;
+            border-radius: 6px;
+            text-align: center;
+            color: white;
+        }
+
+        .title {
+            font-family: "Parisine", 'Abel', sans-serif;
+            display: block;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            margin-block-end: 0;
+            margin-block-start: 0;
+            padding: 24px;
+            font-style: italic;
+            background-color:#414449;
+        }
+
+        .subtitle {
+            background-color:steelblue;
+            display: block;
+            margin-block-end: 0;
+            margin-block-start: 0;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            
+            padding: 6px;
+        }
+
+        #main {
+            text-align: center;
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+
+    
+        a{
+            font-size: 18px;
+        }
+
+
+        @media screen and (max-width: 888px){
+            #navbar {
+                margin-left: 20px;
+                height: auto;
+                display: inline-flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                text-align: center;
+                flex-wrap: nowrap;
+                flex-direction: column;
+                position: absolute;
+                right: 20px;
+                top: 100%;
+                background-color: black;
+                padding-bottom: 10px;
+                border-radius: 6px;
+
+                transition: .2s ease-out;
+                transform: translateY(-20px);
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            #navbar a {
+                margin-top: 6px;
+            }
+
+            #navbar:hover{
+                transform: none;
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            #navbar_icon:hover ~ #navbar{
+                transform: none;
+                opacity: 1;
+                pointer-events: all;
+            }
+            #navbar_icon{
+                background-color: #ccd3d1;
+                height: 100%;
+                aspect-ratio: 1/1;
+                position: absolute;
+                right: 10px;
+                mask-image: url("/web/img/menu.png");
+                -webkit-mask-image: url("/web/img/menu.png");
+                mask-position: center;
+                -webkit-mask-position: center;
+                mask-size: 100%;
+                -webkit-mask-size: 100%;
+                mask-repeat: no-repeat;
+                -webkit-mask-repeat: no-repeat;
+                transition: .1s ease-out;
+            }
+            #navbar_icon:hover{
+                background-color: #b9bebe;
+
+                mask-size: 85%;
+                -webkit-mask-size: 85%;
+            }
+        }
+
+
+
+    </style>
+    <script type="text/javascript">
+        window.addEventListener("DOMContentLoaded", async e => {
+            for (const a of document.getElementsByClassName("navlink")) {
+                a.addEventListener("click", async e => {
+                    if (a.target == "_self") return;
+                    e.preventDefault();
+                    for (const b of document.getElementsByClassName("navlink")) {
+                        b.classList.remove("selected");
+                    }
+                    a.classList.toggle("selected", true);
+
+                    document.getElementById("main").innerHTML = ""; // Loading
+                    const res = await fetch(a.href);
+                    /*if(res.status === 200){
+
+                    }*/
+                    const rep = await res.text();
+                    const domParser = new DOMParser();
+                    const ndoc = domParser.parseFromString(rep, "text/html");
+                    for (const c of ndoc.getElementsByTagName("a")) {
+                        c.href = a.pathname + c.pathname.replaceAll(document.location.origin, "");
+                    }
+                    document.getElementById("main").innerHTML = ndoc.getElementById("main") ? ndoc.getElementById("main").innerHTML : ndoc.body.innerHTML;
+                    if (document.getElementById("tempStyle")) {
+                        document.getElementById("tempStyle").remove();
+                    }
+                    if (ndoc.getElementsByTagName("style")[0]) {
+                        const nStyle = document.createElement("style");
+                        nStyle.id = "tempStyle";
+                        nStyle.innerText = ndoc.getElementsByTagName("style")[0].innerText;
+                        document.head.appendChild(nStyle);
+                    }
+                    history.pushState(document.title, ndoc.title, a.href.replaceAll("/pages", ""));
+
+
+                })
+            }
+        });
+    </script>
+</head>
+<body>
+<div id="header">
+    <img src="/web/img/heimdall.webp" alt="Heimdall" width="64"> <span id="header_gamename">Heimdall</span>
+
+    <span id="navbar_icon"></span>
+    <span id="navbar">
+            <a href="/web/" id="navbar_home" data-link="index" class="navlink">Accueil</a>
+            <a href="/web/command/" id="navbar_app" data-link="app" class="navlink">Command</a>
+            <a href="/web/Nous contacter/" id="navbar_app" data-link="app" class="navlink">Nous contacter</a>
+            <a href="/web/TERMS-OF-SERVICE-URL/" id="navbar_account" target="_self" class="navlink">Conditions D'Utilisation</a>
+            <a href="/web/PRIVACY-POLICY-URL/" id="navbar_account" target="_self" class="navlink">Politique de Confidentialité</a>
+
+
+    </span>
+</div>
+<div id="main">
+    <div id="title_area">
+    <h1 class="title">Heimdall</h1>
+    <h2 class="subtitle">Accueil - Beta v1.1.3</h2>
+</div>
+
+<script type="text/javascript">
+    const preloaded = "index";
+    const element = [...document.getElementsByClassName("navlink")].find(el=>el.dataset.link == preloaded );
+    if(element) element.classList.add("selected");
+
+    history.replaceState(document.title, document.title, preloaded == "index" ? "/" :("/"+preloaded));
+</script>
+</body>
+</html>
